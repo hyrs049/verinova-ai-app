@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:risea/core/splash/splash_screen.dart';
 import 'theme/theme.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:risea/features/upload/upload_screen.dart';
 
 void main() {
   runApp(const ProviderScope(child: MyApp()));
@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
       theme: lightTheme,
       darkTheme: darkTheme,
       themeMode: ThemeMode.system,
-      home: const UploadScreen(),
+      home: const SplashScreen(),
     );
   }
 }
