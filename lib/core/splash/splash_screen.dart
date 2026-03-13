@@ -10,15 +10,20 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  static const int splashDuration = 2; // saniye
+
   @override
   void initState() {
     super.initState();
 
-    Future.delayed(const Duration(seconds: 2), () {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => LoginScreen()),
-      );
+    // Widget tree tamamen yüklendikten sonra yönlendirme başlat
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Timer(const Duration(seconds: splashDuration), () {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const LoginScreen()),
+        );
+      });
     });
   }
 
@@ -26,10 +31,7 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SizedBox.expand(
-        child: Image.asset(
-          "assets/splash.png",
-          fit: BoxFit.cover, // Ekranı tamamen kaplar
-        ),
+        child: Image.asset("assets/splash.png", fit: BoxFit.cover),
       ),
     );
   }
