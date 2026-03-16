@@ -13,11 +13,11 @@ class HomeController extends AsyncNotifier<String> {
 
   Future<void> fetchHealth() async {
     state = const AsyncLoading();
-
     try {
       final apiService = ref.read(apiServiceProvider);
-      final result = await apiService.getHealth();
-      state = AsyncData(result);
+      // getHealth yerine assets çekiyoruz artık
+      final result = await apiService.getAssets();
+      state = AsyncData("${result.length} varlık yüklendi");
     } catch (e, st) {
       state = AsyncError(e, st);
     }
