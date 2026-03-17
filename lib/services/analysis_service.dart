@@ -1,37 +1,39 @@
 import 'dart:math';
+import 'ai_service.dart';
 import '../models/financial_analysis_model.dart';
 
 class AnalysisService {
+  final AiService _aiService = AiService();
+  final Random _random = Random();
+
   Future<FinancialAnalysis> analyzeData() async {
-    await Future.delayed(const Duration(seconds: 2));
-
-    final random = Random();
-
-    List<double> past = List.generate(
+    // Geçmiş fiyatlar — ileride DB'den gelecek
+    final List<double> pastPrices = List.generate(
       6,
-      (index) => 8000 + random.nextDouble() * 4000,
+      (i) => 8000 + _random.nextDouble() * 2000,
     );
 
-    double lastValue = past.last;
-    double predicted = lastValue * (1 + (random.nextDouble() * 0.15));
-    double growth = ((predicted - lastValue) / lastValue) * 100;
+    final results = await Future.wait([
+      _aiService.getPrediction("BTC", pastPrices),
+      _aiService.analyzePortfolio({
+        "BTC": 1000.0 + _random.nextDouble() * 8000,
+        "ETH": 500.0 + _random.nextDouble() * 4000,
+        "USDT": 200.0 + _random.nextDouble() * 2000,
+      }),
+    ]);
+
+    // AI'dan tahmin al
+    final prediction = results[0];
+
+    // AI'dan portföy analizi al
+    final analysis = results[1];
 
     return FinancialAnalysis(
-      pastValues: past,
-      predictedNextValue: predicted,
-      growthRate: growth,
-      aiInsight: _generateInsight(growth),
-      blockchainHash: "0xF${random.nextInt(999999)}A21BC",
+      pastValues: pastPrices,
+      predictedNextValue: (prediction['predicted_price'] as num).toDouble(),
+      growthRate: prediction['trend'] == 'artış' ? 5.0 : -3.0,
+      aiInsight: analysis['insights'][0],
+      blockchainHash: "0xAI_CONNECTED",
     );
-  }
-
-  String _generateInsight(double growth) {
-    if (growth > 10) {
-      return "Tüketim artış trendinde. Önümüzdeki ay maliyet artışı bekleniyor.";
-    } else if (growth < 0) {
-      return "Tüketim düşüş eğiliminde. Verimlilik artışı gözlemleniyor.";
-    } else {
-      return "Tüketim stabil seyrediyor. Mevcut strateji sürdürülebilir.";
-    }
   }
 }
