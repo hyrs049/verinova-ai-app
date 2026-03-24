@@ -1,5 +1,6 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'dart:typed_data';
 
 class AiService {
   static const String baseUrl = 'http://192.168.1.104:8001';
@@ -61,5 +62,21 @@ class AiService {
         )
         .timeout(const Duration(seconds: 5));
     return jsonDecode(res.body);
+  }
+
+  Future<Map<String, dynamic>> uploadCSV(
+    Uint8List bytes,
+    String fileName,
+  ) async {
+    final request = http.MultipartRequest(
+      'POST',
+      Uri.parse('$baseUrl/api/ai/upload'),
+    );
+    request.files.add(
+      http.MultipartFile.fromBytes('file', bytes, filename: fileName),
+    );
+    final response = await request.send();
+    final body = await response.stream.bytesToString();
+    return jsonDecode(body);
   }
 }
