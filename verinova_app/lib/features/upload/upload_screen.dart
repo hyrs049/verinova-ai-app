@@ -53,7 +53,7 @@ class _UploadScreenState extends ConsumerState<UploadScreen> {
     } catch (e) {
       setState(() {
         isLoading = false;
-        statusMessage = "Hata: $e";
+        statusMessage = "Hata: $e\n\nAI servisi çalışıyor mu kontrol edin.";
       });
     }
   }
