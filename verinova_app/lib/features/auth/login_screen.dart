@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../upload/upload_screen.dart';
+import '../../services/api_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -65,43 +66,97 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   // --- İŞLEMLER ---
-  void _handleLogin() {
+  void _handleLogin() async {
     if (_loginFormKey.currentState!.validate()) {
       setState(() => _isLoading = true);
 
-      Future.delayed(const Duration(seconds: 2), () {
-        if (!mounted) return;
-        setState(() => _isLoading = false);
-
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const UploadScreen()),
+      try {
+        final apiService = ApiService();
+        final result = await apiService.login(
+          _emailController.text,
+          _passwordController.text,
         );
-      });
-    }
-  }
 
-  void _handleRegister() {
-    if (_registerFormKey.currentState!.validate()) {
-      setState(() => _isLoading = true);
-
-      Future.delayed(const Duration(seconds: 2), () {
         if (!mounted) return;
         setState(() => _isLoading = false);
 
-        _tabController.animateTo(0);
+        if (result['token'] != null) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const UploadScreen()),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(result['detail'] ?? 'Giriş başarısız'),
+              backgroundColor: Colors.red,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+      } catch (e) {
+        if (!mounted) return;
+        setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Kayıt başarılı! Giriş yapabilirsiniz.'),
-            backgroundColor: Colors.green,
+          SnackBar(
+            content: Text('Bağlantı hatası: $e'),
+            backgroundColor: Colors.red,
             behavior: SnackBarBehavior.floating,
           ),
         );
+      }
+    }
+  }
 
-        _emailController.clear();
-        _passwordController.clear();
-        _confirmPasswordController.clear();
-      });
+  void _handleRegister() async {
+    if (_registerFormKey.currentState!.validate()) {
+      setState(() => _isLoading = true);
+
+      try {
+        final apiService = ApiService();
+        final result = await apiService.register(
+          _emailController.text.split(
+            '@',
+          )[0], // username olarak email'in @ öncesi
+          _emailController.text,
+          _passwordController.text,
+        );
+
+        if (!mounted) return;
+        setState(() => _isLoading = false);
+
+        if (result['message'] != null) {
+          _tabController.animateTo(0);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Kayıt başarılı! Giriş yapabilirsiniz.'),
+              backgroundColor: Colors.green,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+          _emailController.clear();
+          _passwordController.clear();
+          _confirmPasswordController.clear();
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(result['detail'] ?? 'Kayıt başarısız'),
+              backgroundColor: Colors.red,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+      } catch (e) {
+        if (!mounted) return;
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Bağlantı hatası: $e'),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
     }
   }
 

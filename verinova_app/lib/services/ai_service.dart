@@ -3,7 +3,11 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 class AiService {
-  static const String baseUrl = 'http://192.168.1.104:8001';
+  static const bool isWeb = bool.fromEnvironment('dart.library.html');
+  static String get aiUrl =>
+      isWeb ? 'http://localhost:8001' : 'http://10.0.2.2:8001';
+  static String get backendUrl =>
+      isWeb ? 'http://localhost:8000' : 'http://172.18.226.14:8000';
 
   Map<String, String> get _headers => {'Content-Type': 'application/json'};
 
@@ -14,7 +18,7 @@ class AiService {
   ) async {
     final res = await http
         .post(
-          Uri.parse('$baseUrl/api/ai/prediction'),
+          Uri.parse('$aiUrl/api/ai/prediction'),
           headers: _headers,
           body: jsonEncode({'coin': coin, 'prices': prices}),
         )
@@ -28,7 +32,7 @@ class AiService {
   ) async {
     final res = await http
         .post(
-          Uri.parse('$baseUrl/api/ai/analysis'),
+          Uri.parse('$aiUrl/api/ai/analysis'),
           headers: _headers,
           body: jsonEncode({'portfolio': portfolio}),
         )
@@ -42,7 +46,7 @@ class AiService {
   ) async {
     final res = await http
         .post(
-          Uri.parse('$baseUrl/api/ai/anomaly'),
+          Uri.parse('$aiUrl/api/ai/anomaly'),
           headers: _headers,
           body: jsonEncode({'transactions': transactions}),
         )
@@ -56,7 +60,7 @@ class AiService {
   ) async {
     final res = await http
         .post(
-          Uri.parse('$baseUrl/api/ai/recommend'),
+          Uri.parse('$aiUrl/api/ai/recommend'),
           headers: _headers,
           body: jsonEncode({'portfolio': portfolio}),
         )
@@ -70,12 +74,13 @@ class AiService {
   ) async {
     final request = http.MultipartRequest(
       'POST',
-      Uri.parse('$baseUrl/api/ai/upload'),
+      Uri.parse('$aiUrl/api/ai/upload'),
     );
     request.files.add(
       http.MultipartFile.fromBytes('file', bytes, filename: fileName),
     );
-    final response = await request.send();
+    final response = await request.send().timeout(const Duration(seconds: 15));
+
     final body = await response.stream.bytesToString();
     return jsonDecode(body);
   }

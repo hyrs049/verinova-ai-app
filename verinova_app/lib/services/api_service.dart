@@ -3,7 +3,8 @@ import 'dart:convert';
 
 class ApiService {
   // Local test
-  static const String baseUrl = 'http://localhost:8000';
+  static const String backendUrl = 'http://172.18.226.14:8000';
+  static const String aiUrl = 'http://172.18.226.50:8001';
 
   // Token tutmak için
   String? _token;
@@ -26,7 +27,7 @@ class ApiService {
     String password,
   ) async {
     final res = await http.post(
-      Uri.parse('$baseUrl/api/auth/register'),
+      Uri.parse('$backendUrl/api/auth/register'),
       headers: _headers,
       body: jsonEncode({
         'username': username,
@@ -39,7 +40,7 @@ class ApiService {
 
   Future<Map<String, dynamic>> login(String email, String password) async {
     final res = await http.post(
-      Uri.parse('$baseUrl/api/auth/login'),
+      Uri.parse('$backendUrl/api/auth/login'),
       headers: _headers,
       body: jsonEncode({'email': email, 'password': password}),
     );
@@ -50,7 +51,7 @@ class ApiService {
 
   Future<Map<String, dynamic>> getMe() async {
     final res = await http.get(
-      Uri.parse('$baseUrl/api/auth/me'),
+      Uri.parse('$backendUrl/api/auth/me'),
       headers: _headers,
     );
     return jsonDecode(res.body);
@@ -60,7 +61,7 @@ class ApiService {
 
   Future<Map<String, dynamic>> getWallet() async {
     final res = await http.get(
-      Uri.parse('$baseUrl/api/blockchain/wallet'),
+      Uri.parse('$backendUrl/api/blockchain/wallet'),
       headers: _headers,
     );
     return jsonDecode(res.body);
@@ -68,7 +69,7 @@ class ApiService {
 
   Future<List<dynamic>> getTransactions() async {
     final res = await http.get(
-      Uri.parse('$baseUrl/api/blockchain/transactions'),
+      Uri.parse('$backendUrl/api/blockchain/transactions'),
       headers: _headers,
     );
     return jsonDecode(res.body);
@@ -76,7 +77,7 @@ class ApiService {
 
   Future<Map<String, dynamic>> transfer(String toAddress, double amount) async {
     final res = await http.post(
-      Uri.parse('$baseUrl/api/blockchain/transfer'),
+      Uri.parse('$backendUrl/api/blockchain/transfer'),
       headers: _headers,
       body: jsonEncode({'to_address': toAddress, 'amount': amount}),
     );
@@ -85,7 +86,7 @@ class ApiService {
 
   Future<Map<String, dynamic>> getBalance() async {
     final res = await http.get(
-      Uri.parse('$baseUrl/api/blockchain/balance'),
+      Uri.parse('$backendUrl/api/blockchain/balance'),
       headers: _headers,
     );
     return jsonDecode(res.body);
@@ -95,7 +96,7 @@ class ApiService {
 
   Future<List<dynamic>> getAssets() async {
     final res = await http.get(
-      Uri.parse('$baseUrl/api/data/assets'),
+      Uri.parse('$backendUrl/api/data/assets'),
       headers: _headers,
     );
     return jsonDecode(res.body);
@@ -103,7 +104,7 @@ class ApiService {
 
   Future<List<dynamic>> getPrices() async {
     final res = await http.get(
-      Uri.parse('$baseUrl/api/data/prices'),
+      Uri.parse('$backendUrl/api/data/prices'),
       headers: _headers,
     );
     return jsonDecode(res.body);
@@ -111,7 +112,7 @@ class ApiService {
 
   Future<List<dynamic>> getPriceHistory(String id) async {
     final res = await http.get(
-      Uri.parse('$baseUrl/api/data/history/$id'),
+      Uri.parse('$backendUrl/api/data/history/$id'),
       headers: _headers,
     );
     return jsonDecode(res.body);
@@ -121,7 +122,7 @@ class ApiService {
 
   Future<Map<String, dynamic>> getAIPrediction(String coin) async {
     final res = await http.get(
-      Uri.parse('$baseUrl/api/ai/prediction/$coin'),
+      Uri.parse('$aiUrl/api/ai/prediction/$coin'),
       headers: _headers,
     );
     return jsonDecode(res.body);
@@ -129,7 +130,7 @@ class ApiService {
 
   Future<Map<String, dynamic>> getPortfolioAnalysis() async {
     final res = await http.get(
-      Uri.parse('$baseUrl/api/ai/analysis'),
+      Uri.parse('$aiUrl/api/ai/analysis'),
       headers: _headers,
     );
     return jsonDecode(res.body);
@@ -139,7 +140,7 @@ class ApiService {
     Map<String, dynamic> portfolio,
   ) async {
     final res = await http.post(
-      Uri.parse('$baseUrl/api/ai/recommend'),
+      Uri.parse('$aiUrl/api/ai/recommend'),
       headers: _headers,
       body: jsonEncode({'portfolio': portfolio}),
     );
